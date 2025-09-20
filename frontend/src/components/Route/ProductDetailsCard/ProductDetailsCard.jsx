@@ -6,7 +6,7 @@ import {
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "../../../styles/styles";
 
 const ProductDetailsCard = ({ setOpen, data }) => {
@@ -41,6 +41,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
               <div className="w-full 800px:w-[50%]">
                 <img src={data.image_Url[0].url} alt="image" />
                 <div className="flex">
+                   <Link to={`/shop/preview/${data.shop._id}`} className="flex">
                   <img
                     src={data.shop.shop_avatar.url}
                     alt=""
@@ -52,6 +53,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                       ({data.shop.ratings}) Ratings
                     </h5>
                   </div>
+                  </Link>
                 </div>
                 <div
                   className={`${styles.button} bg-[#000] mt-4 rounded-[4px] h-11`}

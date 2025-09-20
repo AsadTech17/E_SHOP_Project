@@ -6,6 +6,7 @@ const Shop = require("../model/shop");
 const Event = require("../model/event");
 const { isSeller } = require("../middleware/auth");
 const router = express.Router();
+const fs = require("fs");
 
 // create event
 router.post(
@@ -37,7 +38,20 @@ router.post(
   })
 );
 
-// get all events
+// get all events 
+router.get("/get-all-events", async (req, res, next) => {
+  try {
+    const events = await Event.find();
+    res.status(201).json({
+      success: true,
+      events,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error, 400));
+  }
+});
+
+// get all events of a shop
 router.get(
   "/get-all-events/:id",
   catchAsyncErrors(async (req, res, next) => {
@@ -54,14 +68,27 @@ router.get(
   })
 );
 
-// delete all events of a shop
+// delete event of a shop
 router.delete(
   "/delete-shop-event/:id",
   isSeller,
   catchAsyncErrors(async (req, res, next) => {
     try {
       const productId = req.params.id;
-      const event = await Event.findById(req.params.id);
+      const eventData = await Event.findById(productId);
+
+      eventData.images.forEach((imageUrl) => {
+        const filename = imageUrl;
+        const filepath = `uploads/${filename}`;
+
+        fs.unlink(filepath, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+      });
+
+      const event = await Event.findByIdAndDelete(productId);
 
       if (!event) {
         return next(new ErrorHandler("Event is not found with this id", 404));
@@ -76,5 +103,6 @@ router.delete(
     }
   })
 );
+
 
 module.exports = router;

@@ -19,6 +19,7 @@ import {
   ShopLoginPage,
   OrderDetailsPage,
   TrackOrderPage,
+  UserInbox,
 } from "./routes/Routes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -39,6 +40,8 @@ import {
   ShopOrderDetails,
   ShopAllRefunds,
   ShopSettingsPage,
+  ShopWithDrawMoneyPage,
+  ShopInboxPage,
 } from "./routes/ShopRoutes.js";
 import { getAllProducts } from "./redux/actions/product";
 import { getAllEvents } from "./redux/actions/event";
@@ -115,6 +118,14 @@ function App() {
           }
         />
         <Route
+          path="/inbox"
+          element={
+            <ProtectedRoute>
+              <UserInbox />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/user/order/:id"
           element={
             <ProtectedRoute>
@@ -142,7 +153,7 @@ function App() {
             </SellerProtectedRoute>
           }
         />
-         <Route
+        <Route
           path="/settings"
           element={
             <SellerProtectedRoute>
@@ -219,6 +230,22 @@ function App() {
           element={
             <SellerProtectedRoute>
               <ShopAllCoupons />
+            </SellerProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard-withdraw-money"
+          element={
+            <SellerProtectedRoute>
+              <ShopWithDrawMoneyPage />
+            </SellerProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard-messages"
+          element={
+            <SellerProtectedRoute>
+              <ShopInboxPage />
             </SellerProtectedRoute>
           }
         />

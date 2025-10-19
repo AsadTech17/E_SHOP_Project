@@ -40,6 +40,9 @@ const shopSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  withdrawMethod: {
+    type: Object,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -49,8 +52,8 @@ const shopSchema = new mongoose.Schema({
 });
 
 //  Hash password
-shopSchema.pre("save", async function (next){
-  if(!this.isModified("password")){
+shopSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     next();
   }
 
@@ -59,7 +62,7 @@ shopSchema.pre("save", async function (next){
 
 // jwt token
 shopSchema.methods.getJwtToken = function () {
-  return jwt.sign({ id: this._id}, process.env.JWT_SECRET_KEY,{
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES,
   });
 };

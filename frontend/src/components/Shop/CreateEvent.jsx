@@ -30,10 +30,11 @@ const CreateEvent = () => {
     const minEndDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
     setStartDate(startDate);
     setEndDate(null);
-    document.getElementById("end-date").min = minEndDate.toISOString().slice(
-      0,
-      10
-    );
+
+    const endDateInput = document.getElementById("end-date");
+    if (endDateInput) {
+      endDateInput.min = minEndDate.toISOString().slice(0, 10);
+    }
   };
 
   const handleEndDateChange = (e) => {
@@ -82,7 +83,7 @@ const CreateEvent = () => {
     newForm.append("stock", stock);
     newForm.append("shopId", seller?._id);
     newForm.append("start_Date", startDate.toISOString());
-    newForm.append("Finish_Date",endDate.toISOString());
+    newForm.append("Finish_Date", endDate.toISOString());
     dispatch(createEvent(newForm));
   };
 

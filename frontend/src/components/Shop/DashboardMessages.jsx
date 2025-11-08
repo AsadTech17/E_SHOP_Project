@@ -1,8 +1,8 @@
 import axios from "axios";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
-import { server } from "../../server";
-import { useDispatch, useSelector } from "react-redux";
+import { backend_url, server } from "../../server";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
 import styles from "../../styles/styles";
@@ -103,7 +103,7 @@ const DashboardMessages = () => {
     };
 
     const receiverId = currentChat.members.find(
-      (member) => member.id !== seller._id
+      (member) => member !== seller._id
     );
 
     socketId.emit("sendMessage", {
@@ -149,45 +149,43 @@ const DashboardMessages = () => {
       });
   };
 
-  const handleImageUpload = async (e) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setImages(reader.result);
-        imageSendingHandler(reader.result);
-      }
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImages(file);
+    imageSendingHandler(file);
   };
 
-  const imageSendingHandler = async (e) => {
+  const imageSendingHandler = async (file) => {
     const receiverId = currentChat.members.find(
       (member) => member !== seller._id
     );
 
+    const formData = new FormData();
+    formData.append("images", file); // append single file
+    formData.append("sender", seller._id);
+    formData.append("text", "");
+    formData.append("conversationId", currentChat._id);
+
+    // Emit to socket as array of objects
     socketId.emit("sendMessage", {
       senderId: seller._id,
       receiverId,
-      images: e,
+      images: [{ url: URL.createObjectURL(file) }],
     });
 
     try {
-      await axios
-        .post(`${server}/message/create-new-message`, {
-          images: e,
-          sender: seller._id,
-          text: newMessage,
-          conversationId: currentChat._id,
-        })
-        .then((res) => {
-          setImages();
-          setMessages([...messages, res.data.message]);
-          updateLastMessageForImage();
-        });
+      const res = await axios.post(
+        `${server}/message/create-new-message`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setImages(null);
+      setMessages((prev) => [...prev, res.data.message]);
+      updateLastMessageForImage();
     } catch (error) {
-      console.log(error);
+      console.log("Image upload failed:", error);
     }
   };
 
@@ -202,7 +200,7 @@ const DashboardMessages = () => {
   };
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ beahaviour: "smooth" });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
@@ -300,7 +298,7 @@ const MessageList = ({
     >
       <div className="relative">
         <img
-          src={`${user?.avatar?.url}`}
+          src={`${backend_url}/${user?.avatar}`}
           alt=""
           className="w-[50px] h-[50px] rounded-full"
         />
@@ -315,7 +313,7 @@ const MessageList = ({
         <p className="text-[16px] text-[#000c]">
           {!isLoading && data?.lastMessageId !== user?._id
             ? "You:"
-            : user?.name.split(" ")[0] + ": "}{" "}
+            : (user?.name || "User").split(" ")[0] + ": "}{" "}
           {data?.lastMessage}
         </p>
       </div>
@@ -341,7 +339,7 @@ const SellerInbox = ({
       <div className="w-full flex p-3 items-center justify-between bg-slate-200">
         <div className="flex">
           <img
-            src={`${userData?.avatar?.url}`}
+            src={`${backend_url}/${userData?.avatar}`}
             alt=""
             className="w-[60px] h-[60px] rounded-full"
           />
@@ -363,6 +361,7 @@ const SellerInbox = ({
           messages.map((item, index) => {
             return (
               <div
+                key={item._id || index}
                 className={`flex w-full my-2 ${
                   item.sender === sellerId ? "justify-end" : "justify-start"
                 }`}
@@ -370,17 +369,41 @@ const SellerInbox = ({
               >
                 {item.sender !== sellerId && (
                   <img
-                    src={`${userData?.avatar?.url}`}
+                    src={`${backend_url}/${userData?.avatar}`}
                     className="w-[40px] h-[40px] rounded-full mr-3"
                     alt=""
                   />
                 )}
                 {item.images && (
-                  <img
-                    src={`${item.images?.url}`}
-                    className="w-[300px] h-[300px] object-cover rounded-[10px] mr-2"
-                  />
+                  <div className="flex flex-wrap gap-2 ml-2 mb-2">
+                    {Array.isArray(item.images)
+                      ? item.images.map((img, i) => {
+                          // 🧠 Clean the path: remove "uploads\" or "uploads/"
+                          const cleanPath = img.url
+                            ?.replace(/^uploads[\\/]/, "") // remove uploads\ or uploads/
+                            .replace(/\\/g, "/"); // fix slashes
+
+                          return (
+                            <img
+                              key={i}
+                              src={`${backend_url}/${cleanPath}`}
+                              alt="message-img"
+                              className="w-[200px] h-[200px] object-cover rounded-[10px]"
+                            />
+                          );
+                        })
+                      : item.images.url && (
+                          <img
+                            src={`${backend_url}/${item.images.url
+                              .replace(/^uploads[\\/]/, "")
+                              .replace(/\\/g, "/")}`}
+                            alt="message-img"
+                            className="w-[200px] h-[200px] object-cover rounded-[10px]"
+                          />
+                        )}
+                  </div>
                 )}
+
                 {item.text !== "" && (
                   <div>
                     <div

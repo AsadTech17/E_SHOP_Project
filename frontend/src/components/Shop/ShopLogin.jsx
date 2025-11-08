@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 
 function ShopLogin() {
   const navigate = useNavigate();

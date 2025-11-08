@@ -8,15 +8,18 @@ import { getAllOrdersOfShop } from "../../redux/actions/order";
 import { AiOutlineArrowRight } from "react-icons/ai";
 
 const AllOrders = () => {
+  const dispatch = useDispatch();
   const { orders, isLoading } = useSelector((state) => state.order);
   const { seller } = useSelector((state) => state.seller);
 
-  const dispatch = useDispatch();
-
+  // Fetch orders when seller ID changes
   useEffect(() => {
-    dispatch(getAllOrdersOfShop(seller?._id));
-  }, [dispatch]);
+    if (seller?._id) {
+      dispatch(getAllOrdersOfShop(seller._id));
+    }
+  }, [dispatch, seller?._id]);
 
+  // Define columns
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
@@ -25,12 +28,12 @@ const AllOrders = () => {
       headerName: "Status",
       minWidth: 130,
       flex: 0.7,
-      cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
+      cellClassName: (params) =>
+        params.getValue(params.id, "status")?.toLowerCase() === "delivered"
           ? "greenColor"
-          : "redColor";
-      },
+          : "redColor",
     },
+
     {
       field: "itemsQty",
       headerName: "Items Qty",
@@ -48,54 +51,44 @@ const AllOrders = () => {
     },
 
     {
-      field: " ",
+      field: "actions",
+      headerName: "Actions",
       flex: 1,
       minWidth: 150,
-      headerName: "",
-      type: "number",
       sortable: false,
-      renderCell: (params) => {
-        return (
-          <>
-            <Link to={`/order/${params.id}`}>
-              <Button>
-                <AiOutlineArrowRight size={20} />
-              </Button>
-            </Link>
-          </>
-        );
-      },
+      renderCell: (params) => (
+        <Link to={`/order/${params.id}`}>
+          <Button>
+            <AiOutlineArrowRight size={20} />
+          </Button>
+        </Link>
+      ),
     },
   ];
 
-  const row = [];
-
-  orders &&
-    orders.forEach((item) => {
-      row.push({
-        id: item._id,
-        itemsQty: item.cart.length,
-        total: "US$ " + item.totalPrice,
-        status: item.status,
-      });
-    });
+  // Map orders to rows
+  const rows =
+    orders?.map((item) => ({
+      id: item._id,
+      itemsQty: item.cart.length,
+      total: new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(item.totalPrice),
+      status: item.status,
+    })) || [];
 
   return (
-    <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div className="w-full mx-8 pt-1 mt-10 bg-white">
-          <DataGrid
-            rows={row}
-            columns={columns}
-            pageSize={10}
-            disableSelectionOnClick
-            autoHeight
-          />
-        </div>
-      )}
-    </>
+    <div className="w-full mx-8 pt-1 mt-10 bg-white">
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSize={10}
+        disableSelectionOnClick
+        autoHeight
+        loading={isLoading}
+      />
+    </div>
   );
 };
 

@@ -14,11 +14,18 @@ const ShopInfo = ({ isOwner }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
+  const { seller } = useSelector((state) => state.seller);
+
   useEffect(() => {
-    dispatch(getAllProductsShop(id));
+    const shopId = isOwner ? seller?._id : id;
+    if (!shopId) return;
+
     setIsLoading(true);
+
+    dispatch(getAllProductsShop(shopId));
+
     axios
-      .get(`${server}/shop/get-shop-info/${id}`)
+      .get(`${server}/shop/get-shop-info/${shopId}`)
       .then((res) => {
         setData(res.data.shop);
         setIsLoading(false);
@@ -27,13 +34,23 @@ const ShopInfo = ({ isOwner }) => {
         console.log(error);
         setIsLoading(false);
       });
-  }, []);
+  }, [dispatch, id, isOwner, seller]);
 
   const logoutHandler = async () => {
-    axios.get(`${server}/shop/logout`, {
-      withCredentials: true,
-    });
-    window.location.reload();
+    try {
+      await axios.get(`${server}/shop/logout`, {
+        withCredentials: true,
+      });
+
+      dispatch({ type: "SellerLogoutSuccess" });
+
+      window.location.href = "/shop-login";
+    } catch (error) {
+      console.error(
+        "Logout failed:",
+        error.response?.data?.message || error.message
+      );
+    }
   };
 
   const totalReviewsLength =
@@ -59,7 +76,7 @@ const ShopInfo = ({ isOwner }) => {
           <div className="w-full py-5">
             <div className="w-full flex item-center justify-center">
               <img
-                src={`${data.avatar?.url}`}
+                src={`${backend_url}/${data.avatar}`}
                 alt="seller avatar"
                 className="w-[150px] h-[150px] object-cover rounded-full"
               />

@@ -1,50 +1,42 @@
+const express = require("express");
+const router = express.Router();
+const path = require("path");
 const Messages = require("../model/messages");
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const express = require("express");
-// const cloudinary = require("cloudinary");
 const { upload } = require("../multer");
-const router = express.Router();
-const path = require("path");
 
-// create new message
 router.post(
   "/create-new-message",
   upload.array("images"),
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const messageData = req.body;
+      const messageData = {
+        conversationId: req.body.conversationId,
+        sender: req.body.sender,
+        text: req.body.text || "",
+      };
 
-      if (req.files) {
-        const fileName = req.file.filename;
-        const fileUrls = path.join(fileName);
-        messageData.images = fileUrls;
+      if (req.files && req.files.length > 0) {
+        messageData.images = req.files.map((file) => ({
+          public_id: file.filename,
+          url: file.path.replace(/\\/g, "/"),
+        }));
       }
 
-      messageData.conversationId = req.body.conversationId;
-      messageData.sender = req.body.sender;
-      messageData.text = req.body.text;
-
-      const message = new Messages({
-        conversationId: messageData.conversationId,
-        text: messageData.text,
-        sender: messageData.sender,
-        images: messageData.images ? messageData.images : undefined,
-      });
-
-      await message.save();
+      const message = await Messages.create(messageData);
 
       res.status(201).json({
         success: true,
         message,
       });
     } catch (error) {
-      return next(new ErrorHandler(error.response.message), 500);
+      console.error(error);
+      return next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// get all messages with conversation id
 router.get(
   "/get-all-messages/:id",
   catchAsyncErrors(async (req, res, next) => {

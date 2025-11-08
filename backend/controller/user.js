@@ -12,8 +12,8 @@ const sendToken = require("../utils/jwtToken");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
-  // console.log("BODY:", req.body);
-  // console.log("FILE:", req.file);
+  console.log("BODY:", req.body);
+  console.log("FILE:", req.file);
   try {
     const { name, email, password } = req.body;
     const userEmail = await User.findOne({ email });
@@ -168,8 +168,8 @@ router.get(
       res.cookie("token", null, {
         expires: new Date(Date.now()),
         httpOnly: true,
-        // sameSite: "none",
-        // secure: true,
+        sameSite: "none",
+        secure: true,
       });
       res.status(201).json({
         success: true,

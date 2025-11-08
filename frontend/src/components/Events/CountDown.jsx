@@ -7,22 +7,30 @@ const CountDown = ({ data }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft());
+      const newTime = calculateTimeLeft();
+      setTimeLeft(newTime);
+
+      if (Object.keys(newTime).length === 0) {
+        if (data?._id) {
+          console.log(" Event finished, deleting:", data._id);
+          axios
+            .delete(`${server}/event/delete-shop-event/${data._id}`, {
+              withCredentials: true,
+            })
+            .then(() => console.log(" Event deleted"))
+            .catch((err) => console.error(" Delete failed:", err));
+        } else {
+          console.warn("Missing event _id, cannot delete:", data);
+        }
+      }
     }, 1000);
 
-    if (
-      typeof timeLeft.days === "undefined" &&
-      typeof timeLeft.hours === "undefined" &&
-      typeof timeLeft.minutes === "undefined" &&
-      typeof timeLeft.seconds === "undefined"
-    ) {
-      axios.delete(`${server}/event/delete-shop-event/${data?._id}`);
-    }
     return () => clearTimeout(timer);
-  });
+  }, [timeLeft, data]);
 
   function calculateTimeLeft() {
-    const difference = +new Date(data?.Finish_Date) - +new Date();
+    if (!data?.Finish_Date) return {};
+    const difference = +new Date(data.Finish_Date) - +new Date();
     let timeLeft = {};
 
     if (difference > 0) {
@@ -38,12 +46,10 @@ const CountDown = ({ data }) => {
   }
 
   const timerComponents = Object.keys(timeLeft).map((interval) => {
-    if (!timeLeft[interval]) {
-      return null;
-    }
+    if (!timeLeft[interval]) return null;
 
     return (
-      <span className="text-[25px] text-[#475ad2]">
+      <span key={interval} className="text-[25px] text-[#475ad2]">
         {timeLeft[interval]} {interval}{" "}
       </span>
     );

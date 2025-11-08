@@ -3,11 +3,9 @@ import { Link } from "react-router-dom";
 import styles from "../../../styles/styles";
 import {
   AiFillHeart,
-  AiFillStar,
   AiOutlineEye,
   AiOutlineHeart,
   AiOutlineShoppingCart,
-  AiOutlineStar,
 } from "react-icons/ai";
 import {
   addToWishlist,
@@ -18,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { addTocart } from "../../../redux/actions/cart";
 import Ratings from "../../Products/Ratings";
+import { backend_url } from "../../../server";
 
 const ProductCard = ({ data, isEvent }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
@@ -71,8 +70,8 @@ const ProductCard = ({ data, isEvent }) => {
           }`}
         >
           <img
-            src={`${data.image_Url[0].url}`}
-            alt=""
+            src={`${backend_url}/${data?.images?.[0]}`}
+            alt={data.name}
             className="w-full h-[170px] object-contain"
           />
         </Link>

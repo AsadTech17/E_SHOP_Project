@@ -4,21 +4,26 @@ const messagesSchema = new mongoose.Schema(
   {
     conversationId: {
       type: String,
+      required: true,
     },
     text: {
       type: String,
+      default: "",
     },
     sender: {
       type: String,
+      required: true,
     },
-    images: {
-      public_id: {
-        type: String,
+    images: [
+      {
+        public_id: {
+          type: String,
+        },
+        url: {
+          type: String,
+        },
       },
-      url: {
-        type: String,
-      },
-    },
+    ],
   },
   { timestamps: true }
 );

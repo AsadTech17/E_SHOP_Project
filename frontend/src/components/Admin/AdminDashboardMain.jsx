@@ -37,9 +37,8 @@ const AdminDashboardMain = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
-          ? "greenColor"
-          : "redColor";
+        const status = params.value?.toLowerCase();
+        return status === "delivered" ? "greenColor" : "redColor";
       },
     },
     {

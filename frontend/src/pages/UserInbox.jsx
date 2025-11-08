@@ -3,7 +3,7 @@ import Header from "../components/Layout/Header";
 import { useSelector } from "react-redux";
 import socketIO from "socket.io-client";
 import { format } from "timeago.js";
-import { server } from "../server";
+import { backend_url, server } from "../server";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
@@ -147,43 +147,36 @@ const UserInbox = () => {
       });
   };
 
-  const handleImageUpload = async (e) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setImages(reader.result);
-        imageSendingHandler(reader.result);
-      }
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) imageSendingHandler(file);
   };
 
-  const imageSendingHandler = async (e) => {
+  const imageSendingHandler = async (file) => {
     const receiverId = currentChat.members.find(
       (member) => member !== user._id
     );
 
+    const formData = new FormData();
+    formData.append("images", file);
+    formData.append("sender", user._id);
+    formData.append("text", newMessage);
+    formData.append("conversationId", currentChat._id);
+
     socketId.emit("sendMessage", {
       senderId: user._id,
       receiverId,
-      images: e,
+      images: file.name,
     });
 
     try {
-      await axios
-        .post(`${server}/message/create-new-message`, {
-          images: e,
-          sender: user._id,
-          text: newMessage,
-          conversationId: currentChat._id,
-        })
-        .then((res) => {
-          setImages();
-          setMessages([...messages, res.data.message]);
-          updateLastMessageForImage();
-        });
+      const res = await axios.post(
+        `${server}/message/create-new-message`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      setMessages([...messages, res.data.message]);
+      updateLastMessageForImage();
     } catch (error) {
       console.log(error);
     }
@@ -200,7 +193,7 @@ const UserInbox = () => {
   };
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ beahaviour: "smooth" });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
@@ -298,7 +291,7 @@ const MessageList = ({
     >
       <div className="relative">
         <img
-          src={`${user?.avatar?.url}`}
+          src={`${backend_url}/${user?.avatar}`}
           alt=""
           className="w-[50px] h-[50px] rounded-full"
         />
@@ -339,7 +332,7 @@ const SellerInbox = ({
       <div className="w-full flex p-3 items-center justify-between bg-slate-200">
         <div className="flex">
           <img
-            src={`${userData?.avatar?.url}`}
+            src={`${backend_url}/${userData?.avatar}`}
             alt=""
             className="w-[60px] h-[60px] rounded-full"
           />
@@ -367,17 +360,44 @@ const SellerInbox = ({
             >
               {item.sender !== sellerId && (
                 <img
-                  src={`${userData?.avatar?.url}`}
+                  src={`${backend_url}/${userData?.avatar?.replace(
+                    /\\/g,
+                    "/"
+                  )}`}
                   className="w-[40px] h-[40px] rounded-full mr-3"
-                  alt=""
+                  alt="avatar"
                 />
               )}
+
               {item.images && (
-                <img
-                  src={`${item.images?.url}`}
-                  className="w-[300px] h-[300px] object-cover rounded-[10px] ml-2 mb-2"
-                />
+                <div className="flex flex-wrap gap-2 ml-2 mb-2">
+                  {Array.isArray(item.images)
+                    ? item.images.map((img, i) => {
+                        const cleanPath = img.url
+                          ?.replace(/^uploads[\\/]/, "")
+                          .replace(/\\/g, "/");
+
+                        return (
+                          <img
+                            key={i}
+                            src={`${backend_url}/${cleanPath}`}
+                            alt="message-img"
+                            className="w-[200px] h-[200px] object-cover rounded-[10px]"
+                          />
+                        );
+                      })
+                    : item.images.url && (
+                        <img
+                          src={`${backend_url}/${item.images.url
+                            .replace(/^uploads[\\/]/, "")
+                            .replace(/\\/g, "/")}`}
+                          alt="message-img"
+                          className="w-[200px] h-[200px] object-cover rounded-[10px]"
+                        />
+                      )}
+                </div>
               )}
+
               {item.text !== "" && (
                 <div>
                   <div

@@ -10,12 +10,12 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://e-shop-project-669m.vercel.app/",
+    origin: 'https://e-shop-project-669m.vercel.app/',
     credentials: true,
   })
 );
 
-app.use("/", express.static(path.join(__dirname, "uploads")));
+app.use("/", express.static(path.join(__dirname, "./uploads")));
 app.use("/test", (req, res) => {
   res.send("Hello world!");
 });

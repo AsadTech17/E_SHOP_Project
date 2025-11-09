@@ -5,7 +5,7 @@ import { BsFillBagFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllOrdersOfShop } from "../../redux/actions/order";
 import axios from "axios";
-import { server } from "../../server";
+import { backend_url, server } from "../../server";
 import { toast } from "react-toastify";
 
 const OrderDetails = () => {
@@ -93,7 +93,7 @@ const OrderDetails = () => {
         data?.cart.map((item, index) => (
           <div className="w-full flex items-start mb-5">
             <img
-              src={`${item.images[0]?.url}`}
+              src={`${backend_url}/${item.images[0]}`}
               alt=""
               className="w-[80x] h-[80px]"
             />
@@ -118,7 +118,7 @@ const OrderDetails = () => {
           <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
           <h4 className="pt-3 text-[20px]">
             {data?.shippingAddress.address1 +
-              " " +
+              " " + "/ " +
               data?.shippingAddress.address2}
           </h4>
           <h4 className=" text-[20px]">{data?.shippingAddress.country}</h4>

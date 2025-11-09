@@ -29,9 +29,7 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) =>
-        params.getValue(params.id, "status")?.toLowerCase() === "delivered"
-          ? "greenColor"
-          : "redColor",
+        params.value?.toLowerCase() === "delivered" ? "greenColor" : "redColor",
     },
 
     {

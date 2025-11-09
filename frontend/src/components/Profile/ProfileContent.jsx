@@ -64,7 +64,7 @@ const ProfileContent = ({ active }) => {
       })
       .then((response) => {
         dispatch(loadUser());
-        toast.success("Avatar update successfully!")
+        toast.success("Avatar update successfully!");
       })
       .catch((error) => {
         toast.error(error);
@@ -382,9 +382,7 @@ const TrackOrder = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
-          ? "greenColor"
-          : "redColor";
+        return params.value === "Delivered" ? "greenColor" : "redColor";
       },
     },
     {

@@ -62,7 +62,7 @@ const AllProducts = () => {
         return (
           <>
             <Link to={`/product/${params.id}`}>
-              <Button onClick={() => handleDelete(params.id)}>
+              <Button >
                 <AiOutlineEye size={20} />
               </Button>
             </Link>
@@ -80,7 +80,7 @@ const AllProducts = () => {
       renderCell: (params) => {
         return (
           <>
-            <Button>
+            <Button onClick={() => handleDelete(params.id)}>
               <AiOutlineDelete size={20} />
             </Button>
           </>

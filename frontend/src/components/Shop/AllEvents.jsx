@@ -19,9 +19,9 @@ const AllEvents = () => {
     }
   }, [dispatch, seller]);
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
-      dispatch(deleteEvent(id));
+      await dispatch(deleteEvent(id));
       dispatch(getAllEventsShop(seller._id));
     }
   };
@@ -31,7 +31,7 @@ const AllEvents = () => {
     { field: "name", headerName: "Name", minWidth: 180, flex: 1.4 },
     { field: "price", headerName: "Price", minWidth: 100, flex: 0.6 },
     {
-      field: "Stock",
+      field: "stock",
       headerName: "Stock",
       type: "number",
       minWidth: 80,
@@ -51,7 +51,7 @@ const AllEvents = () => {
       flex: 0.8,
       sortable: false,
       renderCell: (params) => (
-        <Link to={`/product/${params.row.id}`}>
+        <Link to={`/event/${params.row.id}`}>
           <Button>
             <AiOutlineEye size={20} />
           </Button>

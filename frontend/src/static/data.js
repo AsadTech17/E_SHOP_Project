@@ -230,13 +230,13 @@ export const categoriesData = [
     title: "Gifts",
     subTitle: "",
     image_Url:
-      "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg",
+      "https://media.istockphoto.com/id/1443034333/photo/christmas-or-birthday-gift-box-on-white-wooden-table-against-blue-turquoise-bokeh-lights.jpg?s=612x612&w=0&k=20&c=9EzZqIg271JMqgd5m6JutoPxrsKtQAXzM-r_QyHTkws=",
   },
   {
     id: 7,
     title: "Pet Care",
     subTitle: "",
-    image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
+    image_Url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXkY58DeOsh7VgHIq0ZSZZv3FzpQn0bvFU8Q&s",
   },
   {
     id: 8,

@@ -15,10 +15,6 @@ app.use(
   })
 );
 
-app.use("/", express.static(path.join(__dirname, "./uploads")));
-app.use("/", (req, res) => {
-  res.send("Hello world!");
-});
 
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
@@ -49,6 +45,12 @@ app.use("/api/v2/product", product);
 app.use("/api/v2/event", event);
 app.use("/api/v2/coupon", coupon);
 app.use("/api/v2/payment", payment);
+
+
+app.use("/", express.static(path.join(__dirname, "./uploads")));
+app.use("/test", (req, res) => {
+  res.send("Hello world!");
+});
 
 //it's for error handling
 app.use(ErrorHandler);

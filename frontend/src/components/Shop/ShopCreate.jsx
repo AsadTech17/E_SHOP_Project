@@ -31,7 +31,10 @@ function ShopCreate() {
     newForm.append("address", address);
     newForm.append("phoneNumber", phoneNumber);
     axios
-      .post(`${server}/shop/create-shop`, newForm, config)
+      .post(`${server}/shop/create-shop`, newForm, {
+        ...config,
+        withCredentials: true,
+      })
       .then((res) => {
         toast.success(res.data.message);
         setName("");

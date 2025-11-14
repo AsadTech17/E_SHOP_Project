@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { RxCross1 } from "react-icons/rx";
 import styles from "../../styles/styles";
 import { BsCartPlus } from "react-icons/bs";
@@ -23,49 +23,52 @@ const Wishlist = ({ setOpenWishlist }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10">
-      <div className="fixed top-0 right-0 h-full w-[80%] 800px:w-[25%] bg-white flex flex-col overflow-y-scroll justify-between shadow-sm">
-        {wishlist && wishlist.length === 0 ? (
-          <div className="w-full h-screen flex items-center justify-center">
-            <div className="flex w-full justify-end pt-5 pr-5 fixed top-3 right-3">
-              <RxCross1
-                size={25}
-                className="cursor-pointer"
-                onClick={() => setOpenWishlist(false)}
-              />
-            </div>
-            <h5>Wishlist Items is empty!</h5>
+    // overlay: clicking outside closes
+    <div
+      className="fixed inset-0 bg-black/40 z-[999] flex justify-end"
+      onClick={() => setOpenWishlist(false)}
+      role="presentation"
+    >
+      <div
+        // stop overlay click from closing when clicking inside drawer
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Wishlist"
+        className="h-full w-[80%] md:w-[25%] bg-white flex flex-col overflow-y-auto shadow-sm z-[1000]"
+      >
+        <div className="flex justify-end p-4">
+          <button
+            aria-label="Close wishlist"
+            className="cursor-pointer"
+            onClick={() => setOpenWishlist(false)}
+          >
+            <RxCross1 size={22} />
+          </button>
+        </div>
+
+        {(!wishlist || wishlist.length === 0) ? (
+          <div className="flex flex-1 items-center justify-center px-4">
+            <h5>Wishlist is empty!</h5>
           </div>
         ) : (
           <>
-            <div>
-              <div className="flex w-full justify-end pt-5 pr-5">
-                <RxCross1
-                  size={25}
-                  className="cursor-pointer"
-                  onClick={() => setOpenWishlist(false)}
+            <div className={`${styles.noramlFlex ?? "flex items-center"} p-4`}>
+              <AiOutlineHeart size={25} />
+              <h5 className="pl-2 text-[20px] font-[500]">
+                {wishlist.length} item{wishlist.length > 1 ? "s" : ""}
+              </h5>
+            </div>
+
+            <div className="w-full border-t">
+              {wishlist.map((i) => (
+                <CartSingle
+                  key={i._id || i.id}
+                  data={i}
+                  removeFromWishlistHandler={removeFromWishlistHandler}
+                  addToCartHandler={addToCartHandler}
                 />
-              </div>
-              {/* Item length */}
-              <div className={`${styles.noramlFlex} p-4`}>
-                <AiOutlineHeart size={25} />
-                <h5 className="pl-2 text-[20px] font-[500]">
-                  {wishlist && wishlist.length} items
-                </h5>
-              </div>
-              {/* cart Single Items */}
-              <br />
-              <div className="w-full border-t">
-                {wishlist &&
-                  wishlist.map((i, index) => (
-                    <CartSingle
-                      key={index}
-                      data={i}
-                      removeFromWishlistHandler={removeFromWishlistHandler}
-                      addToCartHandler={addToCartHandler}
-                    />
-                  ))}
-              </div>
+              ))}
             </div>
           </>
         )}
@@ -75,34 +78,45 @@ const Wishlist = ({ setOpenWishlist }) => {
 };
 
 const CartSingle = ({ data, removeFromWishlistHandler, addToCartHandler }) => {
-  const [value, setValue] = useState(1);
-  const totalPrice = data.discountPrice * value;
+  const qty = data?.qty ?? 1;
+  const price = data?.discountPrice ?? data?.price ?? 0;
+  const totalPrice = price * qty;
+
+  const imgSrc = data?.images?.[0] ? `${backend_url}${data.images[0]}` : "/placeholder.png";
 
   return (
     <div className="border-b p-4">
-      <div className="w-full 800px:flex items-center">
-        <RxCross1
-          className="cursor-pointer 800px:mb-['unset'] 800px:ml-['unset'] mb-2 ml-2"
+      <div className="flex items-center gap-3">
+        <button
           onClick={() => removeFromWishlistHandler(data)}
-        />
+          aria-label={`Remove ${data.name} from wishlist`}
+          className="text-gray-600"
+        >
+          <RxCross1 />
+        </button>
+
         <img
-          src={`${backend_url}${data?.images[0]}`}
-          alt=""
-          className="w-[130px] h-min ml-2 mr-2 rounded-[5px]"
+          src={imgSrc}
+          alt={data?.name || "product image"}
+          className="w-[130px] rounded-[5px] object-cover"
         />
-        <div className="pl-[5px]">
-          <h1>{data.name}</h1>
-          <h4 className="font-[600] pt-3 800px:pt-[3px] text-[17px] text-[#d02222] font-Roboto">
-            US${totalPrice}
+
+        <div className="flex-1">
+          <h1 className="font-medium">{data?.name}</h1>
+          <h4 className="font-[600] pt-3 text-[17px] text-[#d02222]">
+            US${totalPrice.toFixed(2)}
           </h4>
         </div>
+
         <div>
-          <BsCartPlus
-            size={20}
-            className="cursor-pointer"
-            tile="Add to cart"
+          <button
+            title="Add to cart"
+            aria-label={`Add ${data?.name} to cart`}
             onClick={() => addToCartHandler(data)}
-          />
+            className="p-2"
+          >
+            <BsCartPlus size={20} />
+          </button>
         </div>
       </div>
     </div>

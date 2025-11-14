@@ -15,7 +15,7 @@ const Hero = () => {
       <div className="absolute inset-0 bg-black/40 z-0"></div>
 
       <div
-        className={`${styles.section} relative z-10 w-[90%] 800px:w-[60%] text-center 800px:text-left`}
+        className={`${styles.section} relative w-[90%] 800px:w-[60%] text-center 800px:text-left`}
       >
         <h1 className="text-[35px] 800px:text-[60px] font-bold text-white leading-[1.2] capitalize">
           Discover Best Products <br /> from Top Vendors

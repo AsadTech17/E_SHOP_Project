@@ -55,11 +55,12 @@ const Header = ({ activeHeading }) => {
     <>
       <div className={`${styles.section}`}>
         <div className="hidden 800px:h-[50px] 800px:my-[20px] 800px:flex items-center justify-between">
-          <div>
+          <div className="hidden 800px:flex items-center">
             <Link to="/">
               <img
-                src="https://shopo.quomodothemes.website/assets/images/logo.svg"
-                alt=""
+                src="/logo193.png"
+                alt="Logo"
+                className="w-[180px] h-[60px]"
               />
             </Link>
           </div>
@@ -221,12 +222,12 @@ const Header = ({ activeHeading }) => {
               onClick={() => setOpen(true)}
             />
           </div>
-          <div>
+          <div className="800px:hidden">
             <Link to="/">
               <img
-                src="https://shopo.quomodothemes.website/assets/images/logo.svg"
-                alt=""
-                className="mt-3 cursor-pointer"
+                src="/logo193.png"
+                alt="Logo"
+                className="w-[120px] h-[40px] mt-3 cursor-pointer"
               />
             </Link>
           </div>

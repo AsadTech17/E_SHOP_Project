@@ -60,7 +60,7 @@ const Header = ({ activeHeading }) => {
               <img
                 src="/logo193.png"
                 alt="Logo"
-                className="w-[180px] h-[80px]"
+                className="w-[180px] h-[85px]"
               />
             </Link>
           </div>
@@ -222,12 +222,12 @@ const Header = ({ activeHeading }) => {
               onClick={() => setOpen(true)}
             />
           </div>
-          <div className="800px:hidden">
+          <div className="800px:hidden items-center">
             <Link to="/">
               <img
                 src="/logo193.png"
                 alt="Logo"
-                className="w-[120px] h-[60px] mt-3 cursor-pointer"
+                className="w-[120px] h-[70px] mt-3 cursor-pointer"
               />
             </Link>
           </div>

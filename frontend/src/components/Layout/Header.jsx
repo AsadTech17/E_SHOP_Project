@@ -60,7 +60,7 @@ const Header = ({ activeHeading }) => {
               <img
                 src="/logo193.png"
                 alt="Logo"
-                className="w-[180px] h-[70px]"
+                className="w-[180px] h-[80px]"
               />
             </Link>
           </div>
@@ -227,7 +227,7 @@ const Header = ({ activeHeading }) => {
               <img
                 src="/logo193.png"
                 alt="Logo"
-                className="w-[120px] h-[50px] mt-3 cursor-pointer"
+                className="w-[120px] h-[60px] mt-3 cursor-pointer"
               />
             </Link>
           </div>
